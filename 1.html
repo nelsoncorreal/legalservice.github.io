@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Registro de Datos</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" type="text/css" href="login.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            max-width: 800px;
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .costas-container {
+            margin-top: 20px;
+            border: 1px dashed #007bff;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .costas-entry {
+            margin-bottom: 10px;
+        }
+
+        .movement-table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .movement-table th,
+        .movement-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .movement-table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .movement-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .movement-row input {
+            margin-right: 5px;
+            flex-grow: 1;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>NOMBRE CLIENTE</h2>
+        <form id="data-form">
+            <label for="client-name">Nombres y Apellidos</label>
+            <input type="text" id="client-name" required>
+
+            <label for="client-phone">Teléfono(s)</label>
+            <input type="tel" id="client-phone">
+
+            <label for="client-address">Dirección</label>
+            <input type="text" id="client-address">
+
+            <label for="client-city">Ciudad</label>
+            <input type="text" id="client-city">
+
+            <label for="client-email">Email</label>
+            <input type="email" id="client-email" required>
+
+            <label for="client-account"># Cuenta Bancaria</label>
+            <input type="text" id="client-account">
+
+            <label for="account-type">Ahorro o Corriente</label>
+            <select id="account-type">
+                <option value="ahorro">Ahorro</option>
+                <option value="corriente">Corriente</option>
+            </select>
+
+            <label for="account-holder">Nombre del Cuentahabiente</label>
+            <input type="text" id="account-holder">
+
+            <label for="client-id"># Doc Identidad</label>
+            <input type="text" id="client-id">
+
+            <h2>DEMANDADO</h2>
+            <label for="defendant-name">Nombres y Apellidos</label>
+            <input type="text" id="defendant-name" required>
+
+            <label for="defendant-id"># Doc Identidad</label>
+            <input type="text" id="defendant-id">
+
+            <label for="defendant-phone">Teléfono(s)</label>
+            <input type="tel" id="defendant-phone">
+
+            <label for="defendant-address">Dirección</label>
+            <input type="text" id="defendant-address">
+
+            <label for="defendant-city">Ciudad</label>
+            <input type="text" id="defendant-city">
+
+            <label for="defendant-email">Email</label>
+            <input type="email" id="defendant-email">
+
+            <label for="defendant-payment">Pagaduría(s)</label>
+            <input type="text" id="defendant-payment">
+
+            <h2>OBLIGACION</h2>
+            <label for="title-value"># Del Titulo Valor</label>
+            <input type="text" id="title-value">
+
+            <label for="payment-term">Plazo del Pago (Meses o Años)</label>
+            <input type="text" id="payment-term">
+
+            <label for="credit-date">Fecha del Crédito</label>
+            <input type="date" id="credit-date">
+
+            <label for="expiration-date">Fecha Vencimiento</label>
+            <input type="date" id="expiration-date">
+
+            <label for="late-date">Fecha Mora</label>
+            <input type="date" id="late-date">
+
+            <label for="capital-value">Valor Capital</label>
+            <input type="number" id="capital-value">
+
+            <h2>COSTAS PROCESO</h2>
+            <div class="costas-container">
+                <div class="costas-entry">
+                    <label>Fecha</label>
+                    <input type="date" class="costas-date">
+                    <label>Valor</label>
+                    <input type="number" class="costas-value">
+                    <label>Concepto u Observaciones</label>
+                    <input type="text" class="costas-concept">
+                    <button type="button" class="remove-btn" onclick="removeCostas(this)">Eliminar</button>
+                </div>
+                <button type="button" onclick="addCostas()">Agregar Costas</button>
+            </div>
+
+            <h2>JUZGADOS</h2>
+            <label for="court-name">Nombre Juzgado</label>
+            <input type="text" id="court-name">
+
+            <label for="court-address">Dirección</label>
+            <input type="text" id="court-address">
+
+            <label for="court-city">Ciudad</label>
+            <input type="text" id="court-city">
+
+            <label for="court-phone">Teléfono</label>
+            <input type="tel" id="court-phone">
+
+            <label for="court-email">Email</label>
+            <input type="email" id="court-email">
+
+            <label for="court-case-number">Radicado # de 21 dígitos</label>
+            <input type="text" id="court-case-number">
+
+            <h2>MOVIMIENTOS</h2>
+            <table class="movement-table" id="movement-table">
+                <thead>
+                    <tr>
+                        <th># de MVTO</th>
+                        <th>Expediente</th>
+                        <th>Fecha Creación del Movimiento</th>
+                        <th>Fecha Seguimiento</th>
+                        <th>Trámite a Realizar</th>
+                        <th>Archivo de Email Enviado x Juzgado</th>
+                        <th>Archivo Contestación a Juzgado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="movement-body">
+                    <!-- Filas de movimientos se añadirán aquí -->
+                </tbody>
+            </table>
+            <button type="button" onclick="addMovement()">Agregar Movimiento</button>
+            <button type="submit">Guardar Datos</button>
+        </form>
+        <button id="back-button" style="margin-top: 20px;" onclick="window.location.href='datas.html'">Volver</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+        // Configuración de Firebase (reemplaza con tus propias credenciales)
+        const firebaseConfig = {
+    apiKey: "AIzaSyDblaWYr7qnuOrZxDflz2gilEwc4CgMLA8",
+    authDomain: "bd-gruas-crud.firebaseapp.com",
+    databaseURL: "https://bd-gruas-crud-default-rtdb.firebaseio.com",
+    projectId: "bd-gruas-crud",
+    storageBucket: "bd-gruas-crud.appspot.com",
+    messagingSenderId: "167496761184",
+    appId: "1:167496761184:web:4576d75997e3aebc462805"
+};
+
+        // Inicializa la aplicación de Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Función para agregar una nueva entrada de costas
+        function addCostas() {
+            const costasContainer = document.querySelector('.costas-container');
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('costas-entry');
+            newEntry.innerHTML = `
+                <label>Fecha</label>
+                <input type="date" class="costas-date">
+                <label>Valor</label>
+                <input type="number" class="costas-value">
+                <label>Concepto u Observaciones</label>
+                <input type="text" class="costas-concept">
+                <button type="button" class="remove-btn" onclick="removeCostas(this)">Eliminar</button>
+            `;
+            costasContainer.insertBefore(newEntry, costasContainer.lastChild);
+        }
+
+        // Función para eliminar una entrada de costas
+        function removeCostas(button) {
+            button.parentElement.remove();
+        }
+
+        function uploadFile(file, fileType) {
+    const storage = firebase.storage();
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(`${fileType}/${file.name}`);
+
+    return fileRef.put(file)
+        .then(snapshot => {
+            return snapshot.ref.getDownloadURL();
+        });
+}
+
+        // Función para agregar un nuevo movimiento
+        function addMovement() {
+    const movementBody = document.getElementById('movement-body');
+    const rowCount = movementBody.rows.length + 1;
+
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>${rowCount}</td>
+        <td><input type="text" placeholder="Expediente"></td>
+        <td>${new Date().toLocaleDateString()}</td>
+        <td><input type="date"></td>
+        <td><input type="text" placeholder="Trámite a Realizar"></td>
+        <td><input type="file" accept="application/pdf" class="email-sent-file" data-file-type="emailSent"></td>
+        <td><input type="file" accept="application/pdf" class="contestation-file" data-file-type="contestation"></td>
+        <td><button class="remove-btn" onclick="removeMovement(this)">Eliminar</button></td>
+    `;
+
+    movementBody.appendChild(newRow);
+}
+
+        // Función para eliminar un movimiento
+        function removeMovement(button) {
+            button.closest('tr').remove();
+            updateMovementNumbers(); // Actualiza los números
+        }
+
+        // Actualiza los números de movimiento después de eliminar
+        function updateMovementNumbers() {
+            const movementBody = document.getElementById('movement-body');
+            Array.from(movementBody.rows).forEach((row, index) => {
+                row.cells[0].innerText = index + 1; // Actualiza el número de movimiento
+            });
+        }
+
+        // Guardar datos en Firebase
+        document.getElementById('data-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const clientData = {
+                clientName: document.getElementById('client-name').value,
+                clientPhone: document.getElementById('client-phone').value,
+                clientAddress: document.getElementById('client-address').value,
+                clientCity: document.getElementById('client-city').value,
+                clientEmail: document.getElementById('client-email').value,
+                clientAccount: document.getElementById('client-account').value,
+                accountType: document.getElementById('account-type').value,
+                accountHolder: document.getElementById('account-holder').value,
+                clientId: document.getElementById('client-id').value,
+                defendant: {
+                    name: document.getElementById('defendant-name').value,
+                    id: document.getElementById('defendant-id').value,
+                    phone: document.getElementById('defendant-phone').value,
+                    address: document.getElementById('defendant-address').value,
+                    city: document.getElementById('defendant-city').value,
+                    email: document.getElementById('defendant-email').value,
+                    payment: document.getElementById('defendant-payment').value
+                },
+                obligation: {
+                    titleValue: document.getElementById('title-value').value,
+                    paymentTerm: document.getElementById('payment-term').value,
+                    creditDate: document.getElementById('credit-date').value,
+                    expirationDate: document.getElementById('expiration-date').value,
+                    lateDate: document.getElementById('late-date').value,
+                    capitalValue: document.getElementById('capital-value').value
+                },
+                costs: [],
+                courts: {
+                    name: document.getElementById('court-name').value,
+                    address: document.getElementById('court-address').value,
+                    city: document.getElementById('court-city').value,
+                    phone: document.getElementById('court-phone').value,
+                    email: document.getElementById('court-email').value,
+                    caseNumber: document.getElementById('court-case-number').value
+                },
+                movements: []
+            };
+
+            // Captura los datos de las costas
+            const costasEntries = document.querySelectorAll('.costas-entry');
+            costasEntries.forEach(entry => {
+                const date = entry.querySelector('.costas-date').value;
+                const value = entry.querySelector('.costas-value').value;
+                const concept = entry.querySelector('.costas-concept').value;
+                clientData.costs.push({ date, value, concept });
+            });
+
+// Captura los datos de los movimientos
+const movementRows = document.querySelectorAll('#movement-body tr');
+const movementPromises = [];
+
+movementRows.forEach(row => {
+    const expediente = row.children[1].querySelector('input').value;
+    const seguimiento = row.children[3].querySelector('input').value;
+    const tramite = row.children[4].querySelector('input').value;
+    const emailSentFile = row.children[5].querySelector('input').files[0];
+    const contestationFile = row.children[6].querySelector('input').files[0];
+    const creationDate = row.children[2].innerText;
+
+    const movement = { expediente, creationDate, seguimiento, tramite };
+
+    if (emailSentFile) {
+        const emailSentPromise = uploadFile(emailSentFile, 'emailSent')
+            .then(downloadURL => {
+                movement.emailSent = downloadURL;
+            });
+        movementPromises.push(emailSentPromise);
+    }
+
+    if (contestationFile) {
+        const contestationPromise = uploadFile(contestationFile, 'contestation')
+            .then(downloadURL => {
+                movement.contestation = downloadURL;
+            });
+        movementPromises.push(contestationPromise);
+    }
+
+    clientData.movements.push(movement);
+});
+
+// Espera a que se suban todos los archivos antes de guardar los datos en la base de datos
+Promise.all(movementPromises)
+    .then(() => {
+        // Guarda los datos en Firebase
+        const db = firebase.database();
+        db.ref('datos').push(clientData)
+            .then(() => {
+                alert('Datos guardados correctamente.');
+                window.location.href = 'datas.html'; // Redirige a datas.html
+            })
+            .catch((error) => {
+                console.error('Error al guardar datos:', error);
+                alert('Ocurrió un error al guardar los datos.');
+            });
+    })
+    .catch((error) => {
+        console.error('Error al subir archivos:', error);
+        alert('Ocurrió un error al subir los archivos.');
+    });
+});
+
+    </script>
+</body>
+
+</html>

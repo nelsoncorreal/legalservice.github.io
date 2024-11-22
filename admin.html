@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Justicia-IA - Administración</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" type="text/css" href="login.css">
+    <style>
+        .user-list {
+            margin-top: 20px;
+        }
+
+        .user-list li {
+            margin-bottom: 10px;
+        }
+
+        .user-list button {
+            margin-left: 10px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-list button.edit-btn {
+            background-color: #e7db2e;
+        }
+
+        .user-list button.delete-btn {
+            background-color: #dc3545;
+        }
+
+        .user-list button:hover {
+            background-color: #0056b3;
+        }
+
+        .user-list button.edit-btn:hover {
+            background-color: #e0a800;
+        }
+
+        .user-list button.delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .filter-container {
+            margin-bottom: 10px;
+        }
+
+        .filter-container input {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .header button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .header button:hover {
+            background-color: #0056b3;
+        }
+
+        .notification {
+            margin-top: 10px;
+            color: green;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <div class="header">
+            <h3> <center> Administración de Usuarios </center> </h3>
+        </div>
+
+        <h2>Crear usuario</h2>
+        <form id="user-form">
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <div class="permissions">
+                <label><input type="radio" name="role" value="superusuario"> Super Usuario</label>
+                <label><input type="radio" name="role" value="abogado"> Abogado</label>
+                <label><input type="radio" name="role" value="lectura"> Lectura</label>
+            </div>
+            <button type="submit">Crear usuario</button>
+            <h2>Crear Cliente</h2>
+            <button onclick="redirectToJusticia()">Justicia-IA</button>
+        </form>
+
+        <div class="notification" id="notification"></div>
+
+        <h2>Usuarios existentes</h2>
+        <div class="filter-container">
+            <input type="text" id="user-filter" placeholder="Filtrar usuarios">
+        </div>
+        <ul id="user-list" class="user-list"></ul>
+    </div>
+
+    <!-- Modal para editar rol y contraseña -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Editar Usuario</h2>
+            <label for="role-select">Nuevo rol:</label>
+            <select id="role-select">
+                <option value="superusuario">Super Usuario</option>
+                <option value="abogado">Abogado</option>
+                <option value="lectura">Lectura</option>
+            </select>
+            <label for="new-password">Nueva Contraseña:</label>
+            <input type="password" id="new-password" placeholder="Nueva Contraseña">
+            <button id="saveUserBtn">Guardar Cambios</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQXI2ZMAJnHWMOP_UN-42FA41fuglH9MI",
+            databaseURL: "https://justicia-7fe92-default-rtdb.firebaseio.com",
+            projectId: "justicia-7fe92",
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const userForm = document.getElementById('user-form');
+        const userList = document.getElementById('user-list');
+        const userFilter = document.getElementById('user-filter');
+        const notification = document.getElementById('notification');
+        const editModal = document.getElementById('editModal');
+        const closeModal = document.getElementById('closeModal');
+        const saveUserBtn = document.getElementById('saveUserBtn');
+        let currentUserId = null;
+
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = userForm['email'].value;
+            const password = userForm['password'].value;
+            const role = userForm['role'].value;
+
+            const db = firebase.database();
+            const userRef = db.ref('usuarios').push();
+            userRef.set({
+                email: email,
+                password: password,
+                role: role
+            }).then(() => {
+                userForm.reset();
+                notification.innerText = `Usuario creado: ${email} con rol: ${role}`;
+            }).catch((error) => {
+                console.log('Error al crear el usuario:', error);
+                alert('Ocurrió un error al crear el usuario. Por favor, inténtalo de nuevo.');
+            });
+        });
+
+        const usuariosRef = firebase.database().ref('usuarios');
+        usuariosRef.on('value', (snapshot) => {
+            userList.innerHTML = '';
+            snapshot.forEach((childSnapshot) => {
+                const userId = childSnapshot.key;
+                const userData = childSnapshot.val();
+                displayUser(userId, userData);
+            });
+        }, (error) => {
+            console.log('Error al obtener los usuarios en tiempo real:', error);
+        });
+
+        function displayUser(userId, userData) {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${userData.email} - ${userData.role}</span>
+                            <button class="edit-btn" data-id="${userId}" data-role="${userData.role}" data-email="${userData.email}">Editar</button>
+                            <button class="delete-btn" data-id="${userId}">Eliminar</button>`;
+            userList.appendChild(li);
+        }
+
+        userList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit-btn')) {
+                currentUserId = e.target.dataset.id;
+                const userRole = e.target.dataset.role;
+                const userEmail = e.target.dataset.email;
+                openEditModal(userRole, userEmail);
+            } else if (e.target.classList.contains('delete-btn')) {
+                const userId = e.target.dataset.id;
+                deleteUser(userId);
+            }
+        });
+
+        function openEditModal(role, email) {
+            document.getElementById('role-select').value = role;
+            document.getElementById('new-password').value = ''; // Resetea el campo de contraseña
+            editModal.style.display = "block";
+        }
+
+        closeModal.onclick = function() {
+            editModal.style.display = "none";
+        }
+
+        saveUserBtn.onclick = function() {
+            const newRole = document.getElementById('role-select').value;
+            const newPassword = document.getElementById('new-password').value;
+            const userRef = firebase.database().ref('usuarios/' + currentUserId);
+
+            userRef.update({ role: newRole })
+                .then(() => {
+                    if (newPassword) {
+                        userRef.update({ password: newPassword });
+                    }
+                    console.log('Usuario editado correctamente');
+                    editModal.style.display = "none";
+                })
+                .catch((error) => {
+                    console.log('Error al editar el usuario:', error);
+                });
+        }
+
+        function deleteUser(userId) {
+            const userRef = firebase.database().ref('usuarios/' + userId);
+            userRef.remove()
+                .then(() => {
+                    console.log('Usuario eliminado correctamente');
+                })
+                .catch((error) => {
+                    console.log('Error al eliminar el usuario:', error);
+                });
+        }
+
+        function redirectToJusticia() {
+            window.location.href = "datas.html";
+        }
+
+        userFilter.addEventListener('input', (e) => {
+            const filterValue = e.target.value.toLowerCase();
+            const users = userList.getElementsByTagName('li');
+            Array.from(users).forEach((user) => {
+                const email = user.getElementsByTagName('span')[0].textContent.toLowerCase();
+                if (email.includes(filterValue)) {
+                    user.style.display = '';
+                } else {
+                    user.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

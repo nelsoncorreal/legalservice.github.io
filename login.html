@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Justicia-IA - Inicio de Sesión</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" type="text/css" href="login.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('login.png'); 
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            color: #fff;
+        }
+
+        .form-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border: 2px solid #007bff;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .notification {
+            text-align: center;
+            margin-top: 10px;
+            color: #ffcc00; /* Color para notificaciones */
+        }
+
+        /* Estilos para los emojis */
+        .emoji {
+            position: absolute;
+            font-size: 40px;
+            animation: float 5s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Iniciar Sesión</h2>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Correo electrónico" required>
+            <input type="password" id="login-password" placeholder="Contraseña" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <div class="notification" id="login-notification"></div>
+    </div>
+
+    <div id="emoji-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script>
+        // Configuración de Firebase (reemplaza con tus propias credenciales)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQXI2ZMAJnHWMOP_UN-42FA41fuglH9MI",
+            databaseURL: "https://justicia-7fe92-default-rtdb.firebaseio.com",
+            projectId: "justicia-7fe92",
+        };
+
+        // Inicializa la aplicación de Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Obtén referencia al formulario de inicio de sesión
+        const loginForm = document.getElementById('login-form');
+        const loginNotification = document.getElementById('login-notification');
+
+        // Escucha el evento de envío del formulario de inicio de sesión
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = loginForm['login-email'].value;
+            const password = loginForm['login-password'].value;
+
+            // Verifica el usuario en la base de datos
+            const usuariosRef = firebase.database().ref('usuarios');
+            usuariosRef.orderByChild('email').equalTo(email).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const userId = Object.keys(userData)[0]; // Obtén el ID del usuario
+                        const userRole = userData[userId].role;
+
+                        if (userData[userId].password === password) {
+                            // Redirige según el rol
+                            switch (userRole) {
+                                case 'superusuario':
+                                    window.location.href = 'admin.html';
+                                    break;
+                                case 'abogado':
+                                    window.location.href = 'abogado.html';
+                                    break;
+                                case 'lectura':
+                                    window.location.href = 'lectura.html';
+                                    break;
+                                default:
+                                    loginNotification.innerText = 'Rol desconocido.';
+                            }
+                        } else {
+                            loginNotification.innerText = 'Contraseña incorrecta.';
+                        }
+                    } else {
+                        loginNotification.innerText = 'No se encontró un usuario con ese correo electrónico.';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error al verificar el usuario:', error);
+                    loginNotification.innerText = 'Ocurrió un error al iniciar sesión. Por favor, inténtalo de nuevo.';
+                });
+        });
+
+        // Función para crear emojis dinámicos
+        function createEmoji() {
+            const emojiContainer = document.getElementById('emoji-container');
+            const emoji = document.createElement('div');
+            const emojis = ['⚖️', '👨‍⚖️', '👩‍⚖️', '📚', '💼', '👨‍💼', '👩‍💼'];
+            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.classList.add('emoji');
+
+            // Posiciona el emoji en un lugar aleatorio
+            emoji.style.left = Math.random() * 100 + 'vw';
+            emoji.style.top = Math.random() * 100 + 'vh';
+            emojiContainer.appendChild(emoji);
+
+            // Elimina el emoji después de 5 segundos
+            setTimeout(() => {
+                emoji.remove();
+            }, 5000);
+        }
+
+        // Crea emojis cada 1 segundo
+        setInterval(createEmoji, 1000);
+
+    </script>
+</body>
+
+</html>
